@@ -1,1 +1,2 @@
-backend web php
+go to admin/index.php for TMS
+
