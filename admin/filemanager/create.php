@@ -16,11 +16,12 @@
                     $explode = explode('.', $file_name);
                     $file = strtolower($explode[0]);
                     $ext = strtolower($explode[1]);
-                    $final_name = $file.time().'.'.$ext;
+                    $replace = str_replace(' ','', $file);
+                    $final_name = $replace.time().'.'.$ext;
                     $description = $_POST['description'];
 
                     if($title != "" && $description != "" && $file_name != ""){
-                        if($file_size > 2000){
+                        if($file_size > 200000){
                             if ($ext == "png" || $ext == "jpg" || $ext == "jpeg"){
                                 if(move_uploaded_file($_FILES['dataFile']['tmp_name'],'../uploads/'.$final_name)){
                                     $insert = "INSERT INTO files (title, img_link, type, description) VALUES ('$title', '$final_name', '$ext', '$description')";

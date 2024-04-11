@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `files` (
   `title` varchar(50) NOT NULL,
   `img_link` varchar(15) NOT NULL,
   `type` varchar(50) NOT NULL,
-  `description`  varchar(50) NOT NULL,
+  `description                                              `  varchar(50) NOT NULL,
   `status` int(11) NOT NULL DEFAULT 1,
  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

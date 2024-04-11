@@ -4,48 +4,40 @@
 
 <section class="py-5">
     <div class="container">
-        <div class="title">
-            <a class="btn btn-primary btn-sm " href="index.php" role="button"> Manage teachers</a>
-        </div>
         <div class="card w-35 mx-auto p-2 ">
-            <h3 class="text-center">Add Teacher</h3>
+            <h3 class="text-center">Add User</h3>
+            <a class="btn btn-primary btn-sm " href="index.php" role="button">manage Files </a>
             <div class="card-body ">
 
                 <?php
 
-                if(isset($_GET['id'])){
-                    $id =$_GET['id'];
+                if (isset($_GET['id'])) {
 
-                    $data="SELECT *FROM teachers where id='$id'";
-                    $data_result= mysqli_query($con, $data);
-                    $fetch_data= mysqli_fetch_assoc($data_result);
-
-
+                    $id = $_GET['id'];
+                    $query = "SELECT * FROM files WHERE id=$id";
+                    $result = mysqli_query($con, $query);
+                    $data = $result->fetch_assoc();
                 }
 
                 ?>
-                <form action="" method="POST" enctype="multipart/form-data">
+
+               
+
+                <form action="#" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="input1" class="form-label">Name</label>
-                        <input type="text" class="form-control" name="name" readonly value="<?php echo  $fetch_data['name']; ?>" id="input1" aria-describedby="emailHelp">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="input1" class="form-label">Phone</label>
-                        <input type="text" class="form-control" readonly name="phone" id="input1" value="<?php echo  $fetch_data['phone']; ?>" aria-describedby="emailHelp">
+                        <label for="input1" class="form-label">Title</label>
+                        <input type="text" class="form-control" readonly name="title" id="input1" value="<?php echo $data['title']; ?>" aria-describedby="emailHelp">
                     </div>
                     <div class="mb-3">
-                        <label for="exampleInputEmail1" class="form-label">Email</label>
-                        <input type="email" class="form-control" readonly name="email" value="<?php echo  $fetch_data['email']; ?>" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <label for="input1" class="form-label">Image </label>
+                        <img src="../uploads/<?php echo $data['img_link'];?>" alt="" width="100" height="100">
                     </div>
+
                     <div class="mb-3">
-                        <label for="input1" class="form-label">Faculty</label>
-                        <input type="text" class="form-control" readonly name="faculty" value="<?php echo  $fetch_data['address']; ?>" id="input1" aria-describedby="emailHelp">
+                        <label for="exampleFormControlTextarea1" class="form-label"></label>Description
+                        <textarea class="form-control" id="exampleFormControlTextarea1" readonly name="description" rows="3"><?php echo $data['description']; ?></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="input1" class="form-label">Address</label>
-                        <input type="text" class="form-control" readonly name="address" value="<?php echo  $fetch_data['address']; ?>" id="input1" aria-describedby="emailHelp">
-                    </div>
+
                 </form>
             </div>
         </div>

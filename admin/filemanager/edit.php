@@ -6,77 +6,113 @@
     <div class="container">
         <div class="card w-35 mx-auto p-2 ">
             <h3 class="text-center">Add User</h3>
-            <a class="btn btn-primary btn-sm " href="index.php" role="button"> Manage Teachers</a>
             <div class="card-body ">
 
                 <?php
 
                 if (isset($_GET['id'])) {
-                    $id = $_GET['id'];
 
-                    $data = "SELECT *FROM teachers where id='$id'";
-                    $data_result = mysqli_query($con, $data);
-                    $fetch_data = mysqli_fetch_assoc($data_result);
+                    $id = $_GET['id'];
+                    $query = "SELECT * FROM files WHERE id=$id";
+                    $result = mysqli_query($con, $query);
+                    $data = $result->fetch_assoc();
                 }
 
-                if (isset($_POST['register'])) {
-                    $name = $_POST['name'];
-                    $phone = $_POST['phone'];
-                    $email = $_POST['email'];
-                    $faculty = $_POST['faculty'];
-                    $address = $_POST['address'];
-                    
-                    if ($name != "" && $address != "" && $phone != "" && $email != "") {
-                        $insert = "UPDATE teachers SET name='$name', phone='$phone', email='$email', faculty='$faculty', address='$address' where id='$id'";
-                        $result = mysqli_query($con, $insert);
-
-                        if ($result) {
                 ?>
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <strong>Teacher is Updated</strong>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        <?php
-                            header("Refresh:2; URL=index.php?success");
-                        } else {
-                        ?>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <strong>User is not Updated</strong>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
+
                 <?php
-                            header("Refresh:2; URL=create.php?error");
+
+                if (isset($_POST['submit'])) {
+                    $title = $_POST['title'];
+                    $file_name = $_FILES['dataFile']['name'];
+                    $file_size = $_FILES['dataFile']['size'];
+                    $description = $_POST['description'];
+                    
+                    // submit previous file
+                    if ($title != "" && $file_name == "" && $description!="") {
+                        $querry = "UPDATE  files  SET  title='$title', description='$description' WHERE id='" . $id . "'";
+
+                        $result = mysqli_query($con, $querry);
+                        if ($result) {
+                            echo "Updated title and description";
+                        } else
+                            echo "not updated";
+                    }
+
+                    // submit new file & replace old file
+                    if ($title != "" && $file_name!= "" && $description!="") {
+
+                        if ($file_size > 200000) {
+                            $explode = explode('.', $file_name); // explode cuts the name after the dot.
+                            $file = strtolower($explode[0]);
+                            $ext = strtolower($explode[1]);
+                            $replace = str_replace(' ', '', $file); //to remove space
+                            $finalname = $replace . time() . '.' . $ext; //concating names with time
+                            $target_file = '../uploads/' . $finalname;
+                            if ($ext == 'jpg' || $ext == 'png' || $ext == 'jpeg') {
+
+                                // replace old file
+                                $oldfilelink = $data['img_link']; //file link from database
+                                $finallink = '../uploads/' . $oldfilelink;
+                                unlink($finallink);
+
+                                if (move_uploaded_file($_FILES['dataFile']['tmp_name'], $target_file)) {
+
+                                    $querry = "UPDATE  files  SET  title='$title', img_link='$finalname', type='$ext',description='$description'  WHERE id='$id'";
+                                    $result = mysqli_query($con, $querry);
+                                    if ($result) {
+                                        echo "File uploaded";
+                                        echo "<meta http-equiv=\"refresh\" content=\"2;URL=index.php\">";
+                                    } else {
+                                        echo "File is not uploaded";
+                                    }
+                                } else {
+                                    echo "file upload failed";
+                                }
+                            } else {
+
+                                echo "extension doesn't mattch";
+                            }
+                        } else {
+                ?>
+                            <div class="alert alert-primary" role="alert">
+                                file size must be less than 2MB
+                            </div>
+
+                        <?php
+
                         }
                     } else {
+                        ?>
+                        <div class="alert alert-primary" role="alert">
+                            Updated Succsefully
+                        </div>
 
-                        header("Refresh:0; URL=create.php?empty");
+                <?php
+                        echo "<meta http-equiv=\"refresh\" content=\"2;URL=index.php\">";
                     }
                 }
-
                 ?>
-                <form action="" method="POST" enctype="multipart/form-data">
+
+
+
+                <form action="#" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="input1" class="form-label">Name</label>
-                        <input type="text" class="form-control" name="name" value="<?php echo  $fetch_data['name']; ?>" id="input1" aria-describedby="emailHelp">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="input1" class="form-label">Phone</label>
-                        <input type="text" class="form-control" name="phone" id="input1" value="<?php echo  $fetch_data['phone']; ?>" aria-describedby="emailHelp">
+                        <label for="input1" class="form-label">Title</label>
+                        <input type="text" class="form-control" name="title" id="input1" value="<?php echo $data['title']; ?>" aria-describedby="emailHelp">
                     </div>
                     <div class="mb-3">
-                        <label for="exampleInputEmail1" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" value="<?php echo  $fetch_data['email']; ?>" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <label for="input1" class="form-label">Image </label>
+                        <img src="../uploads/<?php echo $data['img_link'];?>" alt="" width="100" height="100">
+                        <input type="file" class="form-control" name="dataFile" id="input1" aria-describedby="emailHelp">
                     </div>
+
                     <div class="mb-3">
-                        <label for="input1" class="form-label">Faculty</label>
-                        <input type="text" class="form-control" name="faculty" value="<?php echo  $fetch_data['faculty']; ?>" id="input1" aria-describedby="emailHelp">
+                        <label for="exampleFormControlTextarea1" class="form-label"></label>Description
+                        <textarea class="form-control" id="exampleFormControlTextarea1" name="description" rows="3"><?php echo $data['description']; ?></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="input1" class="form-label">Address</label>
-                        <input type="text" class="form-control" name="address" value="<?php echo  $fetch_data['address']; ?>" id="input1" aria-describedby="emailHelp">
-                    </div>
-                    <button type="submit" class="btn btn-danger btn-sm" name="register">Submit</button>
+
+                    <button type="submit" class="btn btn-danger btn-sm" name="submit">Submit</button>
                     <span> Have already an account <a href="index.php"> Login</a></span>
                 </form>
             </div>
